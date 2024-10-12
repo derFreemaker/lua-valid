@@ -163,7 +163,9 @@ end
 
 ---@class lua-valid : lua-valid.validators
 ---@field optional lua-valid.validators
-local validation = {}
+local validation = {
+    optional = {}
+}
 for key, validator in pairs(validators) do
     validation[key] = validator
 end
