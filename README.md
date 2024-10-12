@@ -20,3 +20,6 @@ Lua basic validation library.
 - `found` : the found type
 - `expected` : what was expected
 - `missing` : true if value was `nil`
+
+## Thrid-Party
+- [luaunit](https://github.com/bluebird75/luaunit) (for testing)
