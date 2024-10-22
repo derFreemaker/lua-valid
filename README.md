@@ -11,6 +11,10 @@ Lua basic validation library.
 - `in_list(list)` : verify that value is from the given list
 - `is_table(schema, ignore_not_specified)` : verify that value is of type `table` and when given validate the schema.
 - `is_array(validator, is_object)` : verify that value is of type `table`
+- `is_nil()` : verify that value is of type `nil`
+- `is_function()` : verify that value is of type `function`
+- `is_userdata()` : verify that value is of type `userdata`
+- `is_thread()` : verify that value is of type `thread`
 
 ### Meta Validators
 - `optional.<validator>` : if value is there run validator
