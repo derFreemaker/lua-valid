@@ -69,4 +69,26 @@ function TestIsArray()
     test_validator(v.is_array(v.is_integer(), true), { 123, test = "aasd" }, true)
 end
 
+function TestIsNil()
+    test_validator(v.is_nil(), nil, true)
+    test_validator(v.is_nil(), "not nil", false)
+end
+
+function TestIsFunction()
+    test_validator(v.is_function(), function() end, true)
+    test_validator(v.is_function(), "not a function", false)
+end
+
+function TestIsUserdata()
+    local userdata = newproxy(true)
+    test_validator(v.is_userdata(), userdata, true)
+    test_validator(v.is_userdata(), "not userdata", false)
+end
+
+function TestIsThread()
+    local thread = coroutine.create(function() end)
+    test_validator(v.is_thread(), thread, true)
+    test_validator(v.is_thread(), "not a thread", false)
+end
+
 os.exit(lu.LuaUnit.run())

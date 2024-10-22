@@ -210,6 +210,46 @@ function validators.is_boolean()
     end
 end
 
+---@return lua-valid.validator
+function validators.is_nil()
+    return function(value)
+        if type(value) ~= "nil" then
+            return false, generate_value_error(value, true, "a nil value")
+        end
+        return true
+    end
+end
+
+---@return lua-valid.validator
+function validators.is_function()
+    return function(value)
+        if type(value) ~= "function" then
+            return false, generate_value_error(value, true, "a function")
+        end
+        return true
+    end
+end
+
+---@return lua-valid.validator
+function validators.is_userdata()
+    return function(value)
+        if type(value) ~= "userdata" then
+            return false, generate_value_error(value, true, "a userdata")
+        end
+        return true
+    end
+end
+
+---@return lua-valid.validator
+function validators.is_thread()
+    return function(value)
+        if type(value) ~= "thread" then
+            return false, generate_value_error(value, true, "a thread")
+        end
+        return true
+    end
+end
+
 ---@param child_validator lua-valid.validator
 ---@param is_object boolean | nil
 ---@return lua-valid.validator
