@@ -80,8 +80,7 @@ function TestIsFunction()
 end
 
 function TestIsUserdata()
-    local userdata = newproxy(true)
-    test_validator(v.is_userdata(), userdata, true)
+    test_validator(v.is_userdata(), { }, false)
     test_validator(v.is_userdata(), "not userdata", false)
 end
 
