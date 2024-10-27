@@ -687,7 +687,7 @@ function validators.is_array(child_validator, is_object)
         if not is_object then
             for key, value in pairs(array) do
                 if type(key) ~= "number" or key % 1 ~= 0 then
-                    table_insert(v.generate_error({
+                    table_insert(child_errors, v.generate_error({
                         value = value,
                         msg = tostring(key) .. ": not allowed"
                     }))
