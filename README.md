@@ -1,6 +1,9 @@
 # lua-valid
 Lua basic validation library.
 
+## Recommendations
+- [sumneko Lua](https://github.com/LuaLS/lua-language-server) as LSP for type shenanigans
+
 ## Validators
 
 ### Type Validators
@@ -103,7 +106,7 @@ local valid, err = table_validator:validate({ test = "foo" })
 print(valid, err)
 ```
 
-### own Validator Example
+### custom Validator Example
 ```lua
 local validation = require("validation")
 
@@ -118,7 +121,8 @@ local <{validator}> = {}
 
 ---@return <{validator_type}>
 function validators.<{validator}>()
-    local v = validation.new_validator() -- Its recommended to use the `validation.new_validator()` function for basic initialization.
+    -- Its recommended to use the `validation.new_validator()` function for initialization.
+    local v = validation.new_validator(<{validator}>)
 
     -- You can add validation step like so
     v:add_step(function(value)

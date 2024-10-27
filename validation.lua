@@ -190,13 +190,16 @@ end
 local validator_base = v.validator_base
 
 ---@generic T : lua-valid.validator
+---@param validator T
 ---@return T
-function v.new_validator()
-    return {
+function v.new_validator(validator)
+    return setmetatable({
         validators = {},
         validate = validator_base.validate,
         add_step = validator_base.add_step
-    }
+    }, {
+        __index = validator
+    })
 end
 
 ---@alias lua-valid.validate_func<T> fun(value: T) : boolean, lua-valid.error | nil
@@ -255,7 +258,7 @@ local nil_validator = {}
 ---@return lua-valid.nil_validator
 function validators.is_nil()
     ---@type lua-valid.nil_validator
-    local nil_v = v.new_validator()
+    local nil_v = v.new_validator(nil_validator)
     nil_v:add_step(function(value)
         if type(value) == "nil" then
             return true
@@ -282,10 +285,7 @@ local string_validator = {}
 
 ---@return lua-valid.string_validator
 function validators.is_string()
-    ---@type lua-valid.string_validator
-    local string_v = setmetatable(v.new_validator(), {
-        __index = string_validator,
-    })
+    local string_v = v.new_validator(string_validator)
 
     string_v:add_step(function(value)
         if type(value) == "string" then
@@ -346,10 +346,7 @@ local number_validator = {}
 
 ---@return lua-valid.number_validator
 function validators.is_number()
-    ---@type lua-valid.number_validator
-    local number_v = setmetatable(v.new_validator(), {
-        __index = number_validator
-    })
+    local number_v = v.new_validator(number_validator)
 
     number_v:add_step(function(value)
         if type(value) == "number" then
@@ -448,9 +445,7 @@ local integer_validator = {}
 ---@return lua-valid.integer_validator
 function validators.is_integer()
     ---@type lua-valid.integer_validator
-    local integer_v = setmetatable(v.new_validator(), {
-        __index = integer_validator
-    })
+    local integer_v = v.new_validator(integer_validator)
 
     integer_v:add_step(function(value)
         if type(value) == "number" and value % 1 == 0 then
@@ -556,9 +551,7 @@ end
 ---@return lua-valid.boolean_validator
 function validators.is_boolean()
     ---@type lua-valid.boolean_validator
-    local boolean_v = setmetatable(v.new_validator(), {
-        __index = boolean_validator
-    })
+    local boolean_v = v.new_validator(boolean_validator)
 
     boolean_v:add_step(function(value)
         if type(value) == "boolean" then
@@ -597,9 +590,7 @@ end
 ---@return lua-valid.table_validator
 function validators.is_table(schema, ignore_not_specified)
     ---@type lua-valid.table_validator
-    local table_v = setmetatable(v.new_validator(), {
-        __index = table_validator
-    })
+    local table_v = v.new_validator(table_validator)
 
     table_v:add_step(function(table)
         if type(table) ~= "table" then
@@ -678,9 +669,7 @@ local array_validator = {}
 ---@return lua-valid.array_validator
 function validators.is_array(child_validator, is_object)
     ---@type lua-valid.array_validator
-    local array_v = setmetatable(v.new_validator(), {
-        __index = array_validator
-    })
+    local array_v = v.new_validator(array_validator)
 
     array_v:add_step(function(array)
         if type(array) ~= "table" then
@@ -751,9 +740,7 @@ local function_validator = {}
 ---@return lua-valid.function_validator
 function validators.is_function()
     ---@type lua-valid.function_validator
-    local function_v = setmetatable(v.new_validator(), {
-        __index = function_validator
-    })
+    local function_v = v.new_validator(function_validator)
 
     function_v:add_step(function(value)
         if type(value) == "function" then
@@ -783,9 +770,7 @@ local userdata_validator = {}
 ---@return lua-valid.userdata_validator
 function validators.is_userdata()
     ---@type lua-valid.userdata_validator
-    local userdata_v = setmetatable(v.new_validator(), {
-        __index = userdata_validator
-    })
+    local userdata_v = v.new_validator(userdata_validator)
 
     userdata_v:add_step(function(value)
         if type(value) == "userdata" then
@@ -815,9 +800,7 @@ local thread_validator = {}
 ---@return lua-valid.thread_validator
 function validators.is_thread()
     ---@type lua-valid.thread_validator
-    local thread_v = setmetatable(v.new_validator(), {
-        __index = thread_validator
-    })
+    local thread_v = v.new_validator(thread_validator)
 
     thread_v:add_step(function(value)
         if type(value) == "thread" then
@@ -872,11 +855,9 @@ local or_validator = {}
 ---@param ... lua-valid.validator
 ---@return lua-valid.validator
 function v.OR(...)
-    local or_v = setmetatable(v.new_validator(), {
-        __index = or_validator
-    })
-    local or_validators = { ... }
+    local or_v = v.new_validator(or_validator)
 
+    local or_validators = { ... }
     or_v:add_step(function(value)
         ---@type lua-valid.error[]
         local errors = {}

@@ -14,8 +14,7 @@ end
 
 ---@return my_validator
 function validators.my_validator()
-    ---@type my_validator
-    local my_v = v.new_validator()
+    local my_v = v.new_validator(my_validator)
 
     my_v:add_step(function(value)
         return false, v.generate_error({
