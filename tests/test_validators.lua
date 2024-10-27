@@ -1,3 +1,4 @@
+package.path = "./?.lua"
 lu = require("tests.luaunit")
 
 local v = require("validation")
@@ -6,7 +7,7 @@ local v = require("validation")
 ---@param value any
 ---@param expected_valid boolean
 local function test_validator(validator, value, expected_valid)
-    local valid, err = validator(value)
+    local valid, err = validator:validate(value)
 
     if valid ~= expected_valid then
         if expected_valid then
@@ -39,13 +40,10 @@ function TestIsBoolean()
 end
 
 function TestInList()
-    local list = {
-        "test",
-        123
-    }
+    local list = { "test", "foo"}
 
-    test_validator(v.in_list(list), "test", true)
-    test_validator(v.in_list(list), 123, true)
+    test_validator(v.is_string():in_list(list), "test", true)
+    test_validator(v.is_string():in_list(list), 123, false)
 end
 
 function TestIsTable()
