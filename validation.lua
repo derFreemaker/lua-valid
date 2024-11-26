@@ -77,7 +77,7 @@ local validators = {}
 ---@field validator_base lua-valid.validator
 ---@field validators lua-valid.validators
 ---@field optional lua-valid.validators
-local v = {
+local validation = {
     validators = validators,
 
     -- we add functions in validator base section
@@ -85,7 +85,7 @@ local v = {
     validator_base = {}
 }
 
-setmetatable(v, {
+setmetatable(validation, {
     __index = function(_, key)
         local validator_func = validators[key]
         if not validator_func then
@@ -127,7 +127,7 @@ setmetatable(v, {
 
 ---@param config lua-valid.error.config
 ---@return lua-valid.error
-function v.generate_error(config)
+function validation.generate_error(config)
     ---@type lua-valid.error
     local err = {
         value = config.value,
@@ -163,7 +163,7 @@ end
 
 ---@param err lua-valid.error
 ---@type lua-valid.error.to_string
-v.value_error_to_string = function(err, options)
+validation.value_error_to_string = function(err, options)
     if options.only_msg then
         return err.msg
     end
@@ -187,12 +187,12 @@ end
 ---@class lua-valid.validator
 ---@field validate fun(self: lua-valid.validator, value: any, return_by_first_fail: boolean | nil) : boolean, lua-valid.error | nil
 ---@field validators lua-valid.validate_func<any>[]
-local validator_base = v.validator_base
+local validator_base = validation.validator_base
 
 ---@generic T : lua-valid.validator
 ---@param validator T
 ---@return T
-function v.new_validator(validator)
+function validation.new_validator(validator)
     return setmetatable({
         validators = {},
         validate = validator_base.validate,
@@ -217,7 +217,7 @@ end
 ---@return lua-valid.error | nil
 function validator_base:validate(value, return_by_first_fail)
     local errors = {}
-    local validator_error = v.generate_error({
+    local validator_error = validation.generate_error({
         value = value,
         msg = "validator has errors",
         childs = errors,
@@ -258,17 +258,17 @@ local nil_validator = {}
 ---@return lua-valid.nil_validator
 function validators.is_nil()
     ---@type lua-valid.nil_validator
-    local nil_v = v.new_validator(nil_validator)
+    local nil_v = validation.new_validator(nil_validator)
     nil_v:add_step(function(value)
         if type(value) == "nil" then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             expected = true,
             msg = "a nil",
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true
         })
     end)
@@ -285,18 +285,18 @@ local string_validator = {}
 
 ---@return lua-valid.string_validator
 function validators.is_string()
-    local string_v = v.new_validator(string_validator)
+    local string_v = validation.new_validator(string_validator)
 
     string_v:add_step(function(value)
         if type(value) == "string" then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "a string",
             expected = true,
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true,
         })
     end)
@@ -310,7 +310,7 @@ function string_validator:equals(str)
         if value == str then
             return true
         end
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "does not equal '" .. str .. "'",
         })
@@ -328,7 +328,7 @@ function string_validator:in_list(list)
             end
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "not in list '{ " .. table_concat(list, ", ") .. " }'"
         })
@@ -346,18 +346,18 @@ local number_validator = {}
 
 ---@return lua-valid.number_validator
 function validators.is_number()
-    local number_v = v.new_validator(number_validator)
+    local number_v = validation.new_validator(number_validator)
 
     number_v:add_step(function(value)
         if type(value) == "number" then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "a number",
             expected = true,
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true,
         })
     end)
@@ -373,7 +373,7 @@ function number_validator:equals(num)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "does not equal '" .. tostring(num) .. "'",
         })
@@ -389,7 +389,7 @@ function number_validator:min(min)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "cannot be smaller than min '" .. tostring(min) .. "'"
         })
@@ -405,7 +405,7 @@ function number_validator:max(max)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "cannot be bigger than max '" .. tostring(max) .. "'"
         })
@@ -423,7 +423,7 @@ function number_validator:between(min, max)
 
     self:add_step(function(value)
         if min > value or value > max then
-            return false, v.generate_error({
+            return false, validation.generate_error({
                 value = value,
                 msg = "needs to be between '" .. tostring(min) .. "' and '" .. tostring(max) .. "'",
             })
@@ -445,18 +445,18 @@ local integer_validator = {}
 ---@return lua-valid.integer_validator
 function validators.is_integer()
     ---@type lua-valid.integer_validator
-    local integer_v = v.new_validator(integer_validator)
+    local integer_v = validation.new_validator(integer_validator)
 
     integer_v:add_step(function(value)
         if type(value) == "number" and value % 1 == 0 then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "an integer",
             expected = true,
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true,
         })
     end)
@@ -472,7 +472,7 @@ function integer_validator:equals(int)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "does not equal '" .. tostring(int) .. "'",
         })
@@ -488,7 +488,7 @@ function integer_validator:min(min)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "cannot be smaller than min '" .. tostring(min) .. "'"
         })
@@ -504,7 +504,7 @@ function integer_validator:max(max)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "cannot be bigger than max '" .. tostring(max) .. "'"
         })
@@ -522,7 +522,7 @@ function integer_validator:between(min, max)
 
     self:add_step(function(value)
         if min > value or value > max then
-            return false, v.generate_error({
+            return false, validation.generate_error({
                 value = value,
                 msg = "needs to be between '" .. tostring(min) .. "' and '" .. tostring(max) .. "'",
             })
@@ -551,18 +551,18 @@ end
 ---@return lua-valid.boolean_validator
 function validators.is_boolean()
     ---@type lua-valid.boolean_validator
-    local boolean_v = v.new_validator(boolean_validator)
+    local boolean_v = validation.new_validator(boolean_validator)
 
     boolean_v:add_step(function(value)
         if type(value) == "boolean" then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "a boolean",
             expected = true,
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true,
         })
     end)
@@ -590,15 +590,15 @@ end
 ---@return lua-valid.table_validator
 function validators.is_table(schema, ignore_not_specified)
     ---@type lua-valid.table_validator
-    local table_v = v.new_validator(table_validator)
+    local table_v = validation.new_validator(table_validator)
 
     table_v:add_step(function(table)
         if type(table) ~= "table" then
-            return false, v.generate_error({
+            return false, validation.generate_error({
                 value = table,
                 msg = "a table",
                 expected = true,
-                to_string = v.value_error_to_string,
+                to_string = validation.value_error_to_string,
                 fatal = true,
             })
         end
@@ -612,7 +612,7 @@ function validators.is_table(schema, ignore_not_specified)
             local child_validator = schema[key]
 
             if not child_validator and not ignore_not_specified then
-                table_insert(child_errors, v.generate_error({
+                table_insert(child_errors, validation.generate_error({
                     value = value,
                     msg = tostring(key) .. ": not allowed"
                 }))
@@ -625,7 +625,7 @@ function validators.is_table(schema, ignore_not_specified)
             local child_valid, child_err = child_validator:validate(value, false)
             if not child_valid then
                 ---@cast child_err -nil
-                table_insert(child_errors, v.generate_error({
+                table_insert(child_errors, validation.generate_error({
                     value = value,
                     msg = tostring(key) .. ": " .. child_err.to_string(),
                 }))
@@ -636,7 +636,7 @@ function validators.is_table(schema, ignore_not_specified)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = table,
             msg = "table has validation errors",
             childs = child_errors,
@@ -669,15 +669,15 @@ local array_validator = {}
 ---@return lua-valid.array_validator
 function validators.is_array(child_validator, is_object)
     ---@type lua-valid.array_validator
-    local array_v = v.new_validator(array_validator)
+    local array_v = validation.new_validator(array_validator)
 
     array_v:add_step(function(array)
         if type(array) ~= "table" then
-            return false, v.generate_error({
+            return false, validation.generate_error({
                 value = array,
                 msg = "an array",
                 expected = true,
-                to_string = v.value_error_to_string,
+                to_string = validation.value_error_to_string,
                 fatal = true,
             })
         end
@@ -687,7 +687,7 @@ function validators.is_array(child_validator, is_object)
         if not is_object then
             for key, value in pairs(array) do
                 if type(key) ~= "number" or key % 1 ~= 0 then
-                    table_insert(child_errors, v.generate_error({
+                    table_insert(child_errors, validation.generate_error({
                         value = value,
                         msg = tostring(key) .. ": not allowed"
                     }))
@@ -699,7 +699,7 @@ function validators.is_array(child_validator, is_object)
             local child_valid, child_err = child_validator:validate(value)
             if not child_valid then
                 ---@cast child_err -nil
-                table_insert(child_errors, v.generate_error({
+                table_insert(child_errors, validation.generate_error({
                     value = value,
                     msg = tostring(index) .. ": " .. child_err.to_string()
                 }))
@@ -710,7 +710,7 @@ function validators.is_array(child_validator, is_object)
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = array,
             msg = "array has validation errors",
             childs = child_errors,
@@ -740,18 +740,18 @@ local function_validator = {}
 ---@return lua-valid.function_validator
 function validators.is_function()
     ---@type lua-valid.function_validator
-    local function_v = v.new_validator(function_validator)
+    local function_v = validation.new_validator(function_validator)
 
     function_v:add_step(function(value)
         if type(value) == "function" then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             expected = true,
             msg = "a function",
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true,
         })
     end)
@@ -770,18 +770,18 @@ local userdata_validator = {}
 ---@return lua-valid.userdata_validator
 function validators.is_userdata()
     ---@type lua-valid.userdata_validator
-    local userdata_v = v.new_validator(userdata_validator)
+    local userdata_v = validation.new_validator(userdata_validator)
 
     userdata_v:add_step(function(value)
         if type(value) == "userdata" then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             expected = true,
             msg = "userdata",
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true,
         })
     end)
@@ -800,18 +800,18 @@ local thread_validator = {}
 ---@return lua-valid.thread_validator
 function validators.is_thread()
     ---@type lua-valid.thread_validator
-    local thread_v = v.new_validator(thread_validator)
+    local thread_v = validation.new_validator(thread_validator)
 
     thread_v:add_step(function(value)
         if type(value) == "thread" then
             return true
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             expected = true,
             msg = "a thread",
-            to_string = v.value_error_to_string,
+            to_string = validation.value_error_to_string,
             fatal = true,
         })
     end)
@@ -833,7 +833,7 @@ local function make_optional(validator)
         return validate(self, value, return_by_first_fail)
     end
 end
-v.optional = setmetatable({}, {
+validation.optional = setmetatable({}, {
     __index = function(_, key)
         local validator_func = validators[key]
         if not validator_func then
@@ -854,8 +854,8 @@ local or_validator = {}
 
 ---@param ... lua-valid.validator
 ---@return lua-valid.validator
-function v.OR(...)
-    local or_v = v.new_validator(or_validator)
+function validation.OR(...)
+    local or_v = validation.new_validator(or_validator)
 
     local or_validators = { ... }
     or_v:add_step(function(value)
@@ -870,7 +870,7 @@ function v.OR(...)
             table_insert(errors, err)
         end
 
-        return false, v.generate_error({
+        return false, validation.generate_error({
             value = value,
             msg = "error in or validation",
             childs = errors,
@@ -886,4 +886,4 @@ function v.OR(...)
     return or_v
 end
 
-return v
+return validation
