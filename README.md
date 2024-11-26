@@ -126,7 +126,10 @@ function validators.<{validator}>()
 
     -- You can add validation step like so
     v:add_step(function(value)
-        return false, v.generate_error({
+        -- validate value
+
+        -- return error like so
+        return false, validation.generate_error({ -- its recommended to use validation.generate_error({...})
             value = value,
             msg = "<{custom message}>",
             to_string = function(err, options)

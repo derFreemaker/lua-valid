@@ -1,4 +1,4 @@
-package.path = "./?.lua"
+package.path = "./?.lua;" .. package.path
 lu = require("tests.luaunit")
 
 local v = require("validation")
