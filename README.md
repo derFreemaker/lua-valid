@@ -129,7 +129,7 @@ function validators.<{validator}>()
         -- validate value
 
         -- return error like so
-        return false, validation.generate_error({ -- its recommended to use validation.generate_error({...})
+        return false, validation.generate_error({
             value = value,
             msg = "<{custom message}>",
             to_string = function(err, options)
