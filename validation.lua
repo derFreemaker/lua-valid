@@ -1,74 +1,86 @@
-do
-    ---@param str string
-    ---@param pattern string
-    ---@param plain boolean | nil
-    ---@return string | nil, integer
-    local function find_next(str, pattern, plain)
-        local found = str:find(pattern, 0, plain or true)
-        if found == nil then
-            return nil, 0
-        end
-        return str:sub(0, found - 1), found - 1
-    end
-
-    ---@param str string | nil
-    ---@param sep string | nil
-    ---@param plain boolean | nil
-    ---@return string[]
-    function string.split(str, sep, plain)
-        if str == nil then
-            return {}
-        end
-
-        local strLen = str:len()
-        local sepLen
-
-        if sep == nil then
-            sep = "%s"
-            sepLen = 2
-        else
-            sepLen = sep:len()
-        end
-
-        local tbl = {}
-        local i = 0
-        while true do
-            i = i + 1
-            local foundStr, foundPos = find_next(str, sep, plain)
-
-            if foundStr == nil then
-                tbl[i] = str
-                return tbl
-            end
-
-            tbl[i] = foundStr
-            str = str:sub(foundPos + sepLen + 1, strLen)
-        end
-    end
-
-    ---@generic T
-    ---@generic R
-    ---@param t T[]
-    ---@param func fun(key: any, value: T) : R
-    ---@return R[]
-    function table.map(t, func)
-        local copy = {}
-        for key, value in pairs(t) do
-            copy[key] = func(key, value)
-        end
-        return copy
-    end
-end
-
 -- caching globals for performance
 local type = type
 local pairs = pairs
 local ipairs = ipairs
-local string_split = string.split
 local table_insert = table.insert
 local table_concat = table.concat
-local table_map = table.map
 local tostring = tostring
+
+---@param str string
+---@param pattern string
+---@param plain boolean | nil
+---@return string | nil, integer
+local function _find_next(str, pattern, plain)
+    local found = str:find(pattern, 0, plain or true)
+    if found == nil then
+        return nil, 0
+    end
+    return str:sub(0, found - 1), found - 1
+end
+
+---@param str string | nil
+---@param sep string | nil
+---@param plain boolean | nil
+---@return string[]
+local function string_split(str, sep, plain)
+    if str == nil then
+        return {}
+    end
+
+    local strLen = str:len()
+    local sepLen
+
+    if sep == nil then
+        sep = "%s"
+        sepLen = 2
+    else
+        sepLen = sep:len()
+    end
+
+    local tbl = {}
+    local i = 0
+    while true do
+        i = i + 1
+        local foundStr, foundPos = _find_next(str, sep, plain)
+
+        if foundStr == nil then
+            tbl[i] = str
+            return tbl
+        end
+
+        tbl[i] = foundStr
+        str = str:sub(foundPos + sepLen + 1, strLen)
+    end
+end
+
+---@generic T
+---@generic R
+---@param t T[]
+---@param func fun(key: any, value: T) : R
+---@return R[]
+local function table_map(t, func)
+    local copy = {}
+    for key, value in pairs(t) do
+        copy[key] = func(key, value)
+    end
+    return copy
+end
+
+---@alias type_ext
+---| type
+---| "integer"
+
+---@return type_ext
+local function fancy_type(obj)
+    local _type = type(obj)
+
+    if _type == "number"
+        and math.type(obj) == "integer" then
+        return "integer"
+    end
+
+    return _type
+end
 
 ---@class lua-valid.validators
 local validators = {}
@@ -117,7 +129,7 @@ setmetatable(validation, {
 
 ---@class lua-valid.error
 ---@field value any
----@field found type
+---@field found type_ext
 ---@field msg string
 ---@field missing boolean
 ---@field expected boolean
@@ -131,7 +143,7 @@ function validation.generate_error(config)
     ---@type lua-valid.error
     local err = {
         value = config.value,
-        found = type(config.value),
+        found = fancy_type(config.value),
         missing = type(config.value) == "nil",
         expected = config.expected or false,
         msg = config.msg,
