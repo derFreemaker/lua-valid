@@ -665,9 +665,9 @@ end
 local array_validator = {}
 
 ---@param child_validator lua-valid.validator
----@param is_object boolean | nil
+---@param ignore_named_fields boolean | nil
 ---@return lua-valid.array_validator
-function validators.is_array(child_validator, is_object)
+function validators.is_array(child_validator, ignore_named_fields)
     ---@type lua-valid.array_validator
     local array_v = validation.new_validator(array_validator)
 
@@ -684,7 +684,7 @@ function validators.is_array(child_validator, is_object)
 
         ---@type lua-valid.error[]
         local child_errors = {}
-        if not is_object then
+        if not ignore_named_fields then
             for key, value in pairs(array) do
                 if type(key) ~= "number" or key % 1 ~= 0 then
                     table_insert(child_errors, validation.generate_error({
