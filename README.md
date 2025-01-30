@@ -93,23 +93,21 @@ local valid, err = table_validator:validate({ test = 123 })
 --    test: expected a string found 'number'
 -- }
 print(valid, err)
--- Its important to remember that the to_string function is there to make
--- the error state readable for a human not for value extraction
+-- `is_string()` returns a fatal error if the given value is not a string terminating the validation execution.
 
 local valid, err = table_validator:validate({ test = "asd" })
 -- false   {
 --     test: not in list '{ test, foo }'
 -- }
 print(valid, err)
--- Since `test` is a string we get the error message from the `in_list()` step
--- since `is_string()` returns a fatal error if the given value is not a string.
+-- Since `test` is a string we get the error message from the `in_list()` step.
 
 local valid, err = table_validator:validate({ test = "foo" })
 -- true    nil
 print(valid, err)
 ```
 
-### custom Validator Example
+### Custom Validator Example
 ```lua
 local validation = require("validation")
 
@@ -131,10 +129,12 @@ function validators.<{validator}>()
     v:add_step(function(value)
         -- validate value
 
-        -- return error like so
+        -- Its recommended to use `validation.generate_error(<config>)`
         return false, validation.generate_error({
             value = value,
             msg = "<{custom message}>",
+
+            -- optionaly add a custom to_string function to make the error more readable for humans
             to_string = function(err, options)
                 if options.only_msg then
                     return err.msg
@@ -159,7 +159,6 @@ function <{validator}>:equals(other)
             return true
         end
 
-        -- Its recommended to use `validation.generate_error(<config>)`
         return false, validation.generate_error({
             value = value,
             msg = "was not equal",
