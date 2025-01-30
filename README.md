@@ -85,21 +85,24 @@ local validation = require("validation")
 local table_validator = validation.is_table({
     test = validation.is_string():in_list({ "test", "foo" })
 })
--- If `validation.is_table([schema], [ignore_not_specified])` is given a schema it will also check if the table follows the schema.
+-- If `validation.is_table([schema], [ignore_not_specified])` is given a schema
+-- it will also check if the table follows the schema.
 
 local valid, err = table_validator:validate({ test = 123 })
 -- false   {
 --    test: expected a string found 'number'
 -- }
 print(valid, err)
--- Its important to remember that the to_string function is there to make the error state readable for a human not for value extraction
+-- Its important to remember that the to_string function is there to make
+-- the error state readable for a human not for value extraction
 
 local valid, err = table_validator:validate({ test = "asd" })
 -- false   {
 --     test: not in list '{ test, foo }'
 -- }
 print(valid, err)
--- Since `test` is a string we get the error message from the `in_list()` step since `is_string()` returns a fatal error if the given value is not a string.
+-- Since `test` is a string we get the error message from the `in_list()` step
+-- since `is_string()` returns a fatal error if the given value is not a string.
 
 local valid, err = table_validator:validate({ test = "foo" })
 -- true    nil
@@ -138,7 +141,11 @@ function validators.<{validator}>()
                 end
                 return "some stuff: " .. err.msg
             end,
-            fatal = true, -- Setting this true will mean the validation process will stop at this error and return since its not error safe to proceed when you make type assumptions and don't validate the value type in every step.
+
+            -- Setting this true will mean the validation process will stop at this error
+            -- and return since its not error safe to proceed when you make type assumptions
+            -- and don't validate the value type in every step.
+            fatal = true,
         })
     end)
 
@@ -171,7 +178,8 @@ end
 
 -- now you can use it also as optional like so
 local optional_<validator> = validation.optional.<validator>()
--- this will make it so the validator is only called if there is a value and return true if there is no value 
+-- this will make it so the validator is only called if there is a value
+-- and return true if there is no value 
 ```
 
 ## Thrid-Party
