@@ -12,9 +12,15 @@ Lua basic validation library.
 - `is_number()`: verify that value is of type `number`
 - `is_integer()`: verify that value is of type `integer`
 - `is_boolean()`: verify that value is of type `boolean`
+
 - `is_table([schema], [ignore_not_specified])`: verify that value is of type `table`
-if `ignore_not_specified` is set to true will ignore all fields not in the schema
-- `is_array(child_validator, [ignore_named_fields])`: verify that value is of type `array` if `ignore_named_fields` is set to true will ignore all named fields
+
+    if `ignore_not_specified` is set to true will ignore all fields not in the schema
+
+- `is_array(child_validator, [ignore_named_fields])`: verify that value is of type `array`
+
+    if `ignore_named_fields` is set to true will ignore all named fields
+
 - `is_function()`: verify that value is of type `function`
 - `is_userdata()`: verify that value is of type `userdata`
 - `is_thread()`: verify that value is of type `thread`
@@ -91,7 +97,7 @@ local table_validator = validation.is_table({
 
 local valid, err = table_validator:validate({ test = 123 })
 -- false   {
---    test: expected a string found 'number'
+--    test: expected a string found 'integer'
 -- }
 print(valid, err)
 -- `is_string()` returns a fatal error if the given value is not a string terminating the validation execution.
@@ -104,6 +110,10 @@ print(valid, err)
 -- Since `test` is a string we get the error message from the `in_list()` step.
 
 local valid, err = table_validator:validate({ test = "foo" })
+-- true    nil
+print(valid, err)
+
+local valid, err = table_validator:validate({ test = "test" })
 -- true    nil
 print(valid, err)
 ```

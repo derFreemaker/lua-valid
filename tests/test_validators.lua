@@ -20,6 +20,8 @@ local function test_validator(validator, value, expected_valid)
     end
 end
 
+--//TODO: add tests for all validation steps
+
 function TestIsString()
     test_validator(v.is_string(), "should work", true)
 end
