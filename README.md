@@ -13,7 +13,8 @@ Lua basic validation library.
 - `is_integer()`: verify that value is of type `integer`
 - `is_boolean()`: verify that value is of type `boolean`
 - `is_table([schema], [ignore_not_specified])`: verify that value is of type `table`
-- `is_array(child_validator, [is_object])`: verify that value is of type `array`
+if `ignore_not_specified` is set to true will ignore all fields not in the schema
+- `is_array(child_validator, [ignore_named_fields])`: verify that value is of type `array` if `ignore_named_fields` is set to true will ignore all named fields
 - `is_function()`: verify that value is of type `function`
 - `is_userdata()`: verify that value is of type `userdata`
 - `is_thread()`: verify that value is of type `thread`
