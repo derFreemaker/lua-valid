@@ -66,6 +66,7 @@ function TestIsArray()
     test_validator(v.is_array(v.is_integer()), { 123, 123.123 }, false)
 
     test_validator(v.is_array(v.is_integer()), { 123, test = "aasd" }, false)
+    test_validator(v.is_array(v.is_integer(), false), { 123, test = "aasd" }, false)
     test_validator(v.is_array(v.is_integer(), true), { 123, test = "aasd" }, true)
 end
 
