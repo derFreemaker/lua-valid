@@ -187,7 +187,7 @@ function <{validator}>:equals(other)
 end
 
 -- now you can use it also as optional like so
-local optional_<validator> = validation.optional.<validator>()
+local optional_<{validator}> = validation.optional.<{validator}>()
 -- this will make it so the validator is only called if there is a value
 -- and return true if there is no value 
 ```
