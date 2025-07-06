@@ -157,11 +157,11 @@ function validation.generate_error(config)
     if config.to_string then
         local to_string = config.to_string
         ---@cast to_string -nil
-        function err.to_string(options)
+        err.to_string = function(options)
             return to_string(err, options or {})
         end
     else
-        function err.to_string()
+        err.to_string = function()
             return config.msg
         end
     end
