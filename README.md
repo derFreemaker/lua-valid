@@ -49,25 +49,25 @@ extra validators can be called after `is_integer()`
 - `OR(<validator>...)`: check given validators until valid is found
 
 ## Validation Error
-- `value`: the value
-- `found`: the found type
-- `msg`: custom message from the validator
-- `missing`: if validator is missing value
-- `expected`: if validator expected something (should be more information in `msg`)
-- `childs`: child errors
-- `to_string(options)`: custom to_string function
-- `fatal`: if error is fatal  
+- `value: any`: the value
+- `found: string`: the found type
+- `msg: string`: custom message from the validator
+- `missing: boolean`: if validator is missing value
+- `expected: boolean`: if validator expected something (should be more information in `msg`)
+- `childs: ValidationError[]`: child errors
+- `to_string(options): fun(table)`: custom to_string function
+- `fatal: boolean`: if error is fatal  
 
 ### Validation Error Config
-- `value`: the value
-- `msg`: custom message
-- `expected`: if validator expected something (should be more information in `msg`)
-- `childs`: child errors
-- `to_string(err, options)`: custom to_string function (gets passed the error itself and options)
-- `fatal`: if error was fatal
+- `value: any`: the value
+- `msg: string`: custom message
+- `expected: boolean`: if validator expected something (should be more information in `msg`)
+- `childs: ValidationError[]`: child errors
+- `to_string(err, options): fun(ValidationError, table)`: custom to_string function (gets passed the error itself and options)
+- `fatal: boolean`: if error was fatal
 
 ### Validation Error to_string Options
-- `only_msg`: only msg **should** be return by to_string function.
+- `only_msg: boolean`: only msg **should** be return by to_string function.
 
 ## Examples
 
